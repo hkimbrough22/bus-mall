@@ -13,9 +13,11 @@ const middleImgElem = document.getElementById('middleImg');
 const middleH2Elem = document.getElementById('middleH2');
 const rightImgElem = document.getElementById('rightImg');
 const rightH2Elem = document.getElementById('rightH2');
-let buttonElem;
-let ulElem2 = document.getElementById('clicksCounterUL2');
-let liElem2;
+
+// let buttonElem;
+// let ulElem2 = document.getElementById('clicksCounterUL2');
+// let liElem2;
+
 let leftItem = null;
 let middleItem = null;
 let rightItem = null;
@@ -61,7 +63,7 @@ function getThreeItems() {
   rightItem.views++;
 }
 
-function renderNewItems(){
+function renderNewItems() {
   leftItem.renderItem(leftImgElem, leftH2Elem);
   middleItem.renderItem(middleImgElem, middleH2Elem);
   rightItem.renderItem(rightImgElem, rightH2Elem);
@@ -75,12 +77,64 @@ function renderResults() {
       liElem.textContent = `${item.name} was not viewed.`;
       ulElem.appendChild(liElem);
     }
-    else{
+    else {
       item.getLikesPercentage();
       liElem.textContent = `${item.name}: ${item.likes} likes out of ${item.views} views. (${item.likesPercentage}%)`;
       ulElem.appendChild(liElem);
     }
   }
+}
+
+function renderChart(){
+  const ctx = document.getElementById('chart').getContext('2d');
+  let myItemNameArr = [];
+  let myViewsArr = [];
+  let myLikesArr = [];
+  let myLikesPercentageArr = [];
+  let myColorArr = [];
+
+  for(let item of Item.allItems){
+    myItemNameArr.push(item.name);
+    myViewsArr.push(item.views);
+    myLikesArr.push(item.likes);
+    myLikesPercentageArr.push(item.likesPercentage);
+  }
+
+  for(let i = 0; i <Item.allItems.length; i++){
+    if(i % 4 === 0){
+      myColorArr.push('red');
+    }
+    else if (i % 4 === 1){
+      myColorArr.push('blue');
+    }
+    else if (i % 4 === 2){
+      myColorArr.push('green');
+    }
+    else {
+      myColorArr.push('yellow');
+    }
+  }
+
+  var itemsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: myItemNameArr,
+      datasets: [{
+        label: 'likes',
+        data: myLikesArr,
+        backgroundColor: myColorArr,
+        borderColor: myColorArr,
+        boderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
 }
 
 // function renderResults2() {
@@ -106,17 +160,17 @@ function handleClick(e) {
     clickCounter++;
     console.log(clickCounter);
     if (clickCounter === roundsOfVoting+1) {
-      buttonElem = document.createElement('button');
-      buttonElem.textContent = 'View Results';
-      buttonElem.type = 'button';
-      clickSectionElem.appendChild(buttonElem);
+      // buttonElem = document.createElement('button');
+      // buttonElem.textContent = 'View Results';
+      // buttonElem.type = 'button';
+      // clickSectionElem.appendChild(buttonElem);
       // buttonElem.addEventListener('click', handleButtonClick);
       // let anchorElem = document.createElement('a');
       // let linkNode = document.createTextNode('View Results');
       // anchorElem.appendChild(linkNode);
       // anchorElem.href = "./results.html"
       // clickSectionElem.appendChild(anchorElem);
-      renderResults();
+      renderChart();
       alert('Thanks for your insight!')
       clickSectionElem.removeEventListener('click', handleClick);
     } else if (imageClicked === 'leftImg') {
