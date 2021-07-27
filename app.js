@@ -3,7 +3,7 @@
 // ------------------------------- Global Variables ------------------------------//
 let viewCounter = 0;
 let clickCounter = 0;
-const roundsOfVoting = 10;
+const roundsOfVoting = 25;
 
 const ulElem = document.getElementById('clicksCounterUL');
 const clickSectionElem = document.getElementById('clickSection');
@@ -53,12 +53,12 @@ function getThreeItems() {
   while (leftItem === middleItem || leftItem === rightItem || middleItem === rightItem) {
     leftItemIndex = Math.floor(Math.random() * Item.allItems.length);
     leftItem = Item.allItems[leftItemIndex];
-    let middleItemIndex = Math.floor(Math.random() * Item.allItems.length);
+    middleItemIndex = Math.floor(Math.random() * Item.allItems.length);
     middleItem = Item.allItems[middleItemIndex];
   }
   leftItem.views++;
   middleItem.views++;
-  rightItem.view++;
+  rightItem.views++;
 }
 
 function renderNewItems(){
