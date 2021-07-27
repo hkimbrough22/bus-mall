@@ -1,135 +1,177 @@
-// As a goat farmer I want to figure out the best way to market my goat farm so that I can have lots of poeple come visit to buy goat milk
-// do a marketing survey where we ask users to look at a series of goat photos and choose their favorites so that we can see what is most popular
-// going to have a series of images
-// data associated with each image
-// - name/title
-// - what goat they picked (listener)
-// vote tracker for the goat 
-// count the clicks and limit how many before we calculate (in listener stop when we hit the click count)
-
-// objects for goats
-
-// Goat constructor
-
-// the user will see 2 goats - add goats to the page
-// clicks on one goat
-// event listener will give us info to determine the winning goat
-// goat will get a vote if it was voted for
-// 2 more images come up
-// run out of rounds
-// updarte the UL
-
 'use strict';
 
-
-console.log('hello world');
-
 // ------------------------------- Global Variables ------------------------------//
-let clickCounter = 0;
 let viewCounter = 0;
-const ulElem = document.getElementById('goat-clicks');
-const voteSectionElem = document.getElementById('all_goats');
-const leftGoatImgElem = document.getElementById('left_goat_img');
-const rightGoatImgElem = document.getElementById('right_goat_img');
-const rightGoatH2Elem = document.getElementById('right_goat_h2')
-const leftGoatH2Elem = document.getElementById('left_goat_h2')
+let clickCounter = 0;
+const roundsOfVoting = 10;
 
-let leftGoat = null;
-let rightGoat = null;
+const ulElem = document.getElementById('clicksCounterUL');
+const clickSectionElem = document.getElementById('clickSection');
+const leftImgElem = document.getElementById('leftImg');
+const leftH2Elem = document.getElementById('leftH2');
+const middleImgElem = document.getElementById('middleImg');
+const middleH2Elem = document.getElementById('middleH2');
+const rightImgElem = document.getElementById('rightImg');
+const rightH2Elem = document.getElementById('rightH2');
+let buttonElem;
+let ulElem2 = document.getElementById('clicksCounterUL2');
+let liElem2;
+let leftItem = null;
+let middleItem = null;
+let rightItem = null;
 
-// ------------------------------- Constructor ------------------------------//
-function Goat(name, imgPath) {
+// ------------------------------- Constructor Function------------------------------//
+function Item (name, imgPath) {
   this.name = name;
   this.imgPath = imgPath;
-  this.votes = 0;
-
-  Goat.allGoats.push(this);
+  this.views = 0;
+  this.likes = 0;
+  this.likesPercentage = 0;
+  Item.allItems.push(this);
 }
 
-Goat.allGoats = [];
+Item.allItems = [];
 
-// ------------------------------- Prototype Methods ------------------------------//
-// I will tell the function which img elem and h2 elem I should use
-Goat.prototype.renderGoat = function (img, h2) {
+// ------------------------------- Prototype ------------------------------//
+Item.prototype.renderItem = function (img, h2) {
   img.src = this.imgPath;
   h2.textContent = this.name;
 }
 
-
-
-// ------------------------------- Standard Global Functions ------------------------------//
-function getTwoGoats() {
-  // picks 2 goats at random from an array of goats
-  let leftIndex = Math.floor(Math.random() * Goat.allGoats.length);
-  leftGoat = Goat.allGoats[leftIndex];
-  let rightIndex = Math.floor(Math.random() * Goat.allGoats.length);
-  rightGoat = Goat.allGoats[rightIndex];
-  while (rightGoat === null || rightGoat === leftGoat) {
-    rightIndex = Math.floor(Math.random() * Goat.allGoats.length);
-    rightGoat = Goat.allGoats[rightIndex];
-  }
+Item.prototype.getLikesPercentage = function (likes, views) {
+  this.likesPercentage = Number(this.likes / this.views * 100).toFixed(2);
 }
 
-function renderTheGoats(){
-  leftGoat.renderGoat(leftGoatImgElem, leftGoatH2Elem);
-  rightGoat.renderGoat(rightGoatImgElem, rightGoatH2Elem);
+// ------------------------------- Global Functions ------------------------------//
+function getThreeItems() {
+  let leftItemIndex = Math.floor(Math.random() * Item.allItems.length);
+  leftItem = Item.allItems[leftItemIndex];
+  let middleItemIndex = Math.floor(Math.random() * Item.allItems.length);
+  middleItem = Item.allItems[middleItemIndex];
+  let rightItemIndex = Math.floor(Math.random() * Item.allItems.length);
+  rightItem = Item.allItems[rightItemIndex];
+  while (leftItem === middleItem || leftItem === rightItem || middleItem === rightItem) {
+    leftItemIndex = Math.floor(Math.random() * Item.allItems.length);
+    leftItem = Item.allItems[leftItemIndex];
+    let middleItemIndex = Math.floor(Math.random() * Item.allItems.length);
+    middleItem = Item.allItems[middleItemIndex];
+  }
+  leftItem.views++;
+  middleItem.views++;
+  rightItem.view++;
+}
+
+function renderNewItems(){
+  leftItem.renderItem(leftImgElem, leftH2Elem);
+  middleItem.renderItem(middleImgElem, middleH2Elem);
+  rightItem.renderItem(rightImgElem, rightH2Elem);
 }
 
 function renderResults() {
   ulElem.textContent = '';
-
-  for (let goat of Goat.allGoats) {
+  for (let item of Item.allItems) {
     let liElem = document.createElement('li');
-    liElem.textContent = `${goat.name}: ${goat.votes}`;
-    ulElem.appendChild(liElem)
+    if (item.views === 0) {
+      liElem.textContent = `${item.name} was not viewed.`;
+      ulElem.appendChild(liElem);
+    }
+    else{
+      item.getLikesPercentage();
+      liElem.textContent = `${item.name}: ${item.likes} likes out of ${item.views} views. (${item.likesPercentage}%)`;
+      ulElem.appendChild(liElem);
+    }
   }
-
-  // for (let i = 0; i < Goat.allGoats.length; i++) {
-  //   let goat = Goat.allGoats[i];
-  //   let liElem = document.createElement('li');
-  //   liElem.textContent = `${goat.name}: ${goat.votes}`;
-  //   ulElem.appendChild(liElem)
-  // }
 }
+
+// function renderResults2() {
+//   ulElem2.textContent = '';
+//   for (let item of Item.allItems) {
+//     let liElem2 = document.createElement('li');
+//     if (item.views === 0) {
+//       liElem2.textContent = `${item.name} was not viewed.`;
+//       ulElem2.appendChild(liElem2);
+//     }
+//     else{
+//       item.getLikesPercentage();
+//       liElem2.textContent = `${item.name}: ${item.likes} likes out of ${item.views} views. (${item.likesPercentage}%)`;
+//       ulElem2.appendChild(liElem2);
+//     }
+//   }
+// }
 
 function handleClick(e) {
-  // alert(e.target.id);
   let imageClicked = e.target.id;
-  if (imageClicked === 'right_goat_img' || imageClicked === 'left_goat_img') {
+  console.log(imageClicked);
+  if (imageClicked === 'leftImg' || imageClicked === 'middleImg' || imageClicked === 'rightImg') {
     clickCounter++;
-    if (imageClicked === 'right_goat_img') {
-      rightGoat.votes++;
-      console.log(rightGoat)
+    console.log(clickCounter);
+    if (clickCounter === roundsOfVoting+1) {
+      buttonElem = document.createElement('button');
+      buttonElem.textContent = 'View Results';
+      buttonElem.type = 'button';
+      clickSectionElem.appendChild(buttonElem);
+      // buttonElem.addEventListener('click', handleButtonClick);
+      // let anchorElem = document.createElement('a');
+      // let linkNode = document.createTextNode('View Results');
+      // anchorElem.appendChild(linkNode);
+      // anchorElem.href = "./results.html"
+      // clickSectionElem.appendChild(anchorElem);
+      renderResults();
+      alert('Thanks for your insight!')
+      clickSectionElem.removeEventListener('click', handleClick);
+    } else if (imageClicked === 'leftImg') {
+      leftItem.likes++;
+      renderResults();
+      getThreeItems();
+      renderNewItems();
+    } else if (imageClicked === 'middleImg') {
+      middleItem.likes++;
+      renderResults();
+      getThreeItems();
+      renderNewItems();
+    } else if (imageClicked === 'rightImg') {
+      rightItem.likes++;
+      renderResults();
+      getThreeItems();
+      renderNewItems();
     }
-    if (imageClicked === 'left_goat_img') {
-      leftGoat.votes++;
-      console.log(leftGoat);
-    }
-    getTwoGoats();
-    renderTheGoats();
   }
-  if (clickCounter === 10) {
-    // alert('show the goat totals');
-    renderResults();
-    voteSectionElem.removeEventListener('click', handleClick);
+  else {
+    alert('That was not a valid selection.');
   }
-
 }
 
-// ------------------------------- Listener ------------------------------//
+// function handleButtonClick(e){
+//   window.open('./results.html');
+//   renderResults2();
+//   buttonElem.removeEventListener('click', handleButtonClick);
+// }
 
-voteSectionElem.addEventListener('click', handleClick);
+// ------------------------------- Event Listener ------------------------------//
 
-// ------------------------------- call functions ------------------------------//
+clickSectionElem.addEventListener('click', handleClick);
 
-new Goat('Cruising Goat', './images/cruisin-goat.jpg');
-new Goat('Float Your Goat', './images/float-your-goat.jpg');
-new Goat('Goat Away', './images/goat-away.jpg')
-new Goat('Goat Out of Hand', './images/goat-out-of-hand.jpg')
-new Goat('Kissing Goat', './images/kissing-goat.jpg');
-new Goat('Sassy Goat', './images/sassy-goat.jpg');
-new Goat('Sweater Goat', './images/sweater-goat.jpg');
-new Goat('Smiling Goat', './images/smiling-goat.jpg');
+// ------------------------------- Calling Functions ------------------------------//
 
-getTwoGoats();
-renderTheGoats();
+new Item('Star Wars Bag', './img/bag.jpg');
+new Item('Banana Cutter', './img/banana.jpg');
+new Item('iPad Toilet Paper Stand', './img/bathroom.jpg')
+new Item('Toeless Galoshes', './img/boots.jpg')
+new Item('All-in-One Breakfast Maker', './img/breakfast.jpg')
+new Item('Meatball Bubblegum', './img/bubblegum.jpg')
+new Item('Inverted Chair', './img/chair.jpg')
+new Item('Cthulhu Action Figure', './img/cthulhu.jpg')
+new Item('Dog Duck Bill', './img/dog-duck.jpg')
+new Item('Dragon Meat', './img/dragon.jpg')
+new Item('Pen Utensil Attachments', './img/pen.jpg')
+new Item('Microfiber Cleaning Pet Shoes', './img/pet-sweep.jpg')
+new Item('2-in-1 Scissors', './img/scissors.jpg')
+new Item('Suede Shark Sleeping Bag', './img/shark.jpg')
+new Item('Microfiber Cleaning Baby Onesie', './img/sweep.png')
+new Item('Star Wars Tauntaun Sleeping Bag', './img/tauntaun.jpg')
+new Item('Unicorn Meat', './img/unicorn.jpg')
+new Item('Reverse Watering Can', './img/water-can.jpg')
+new Item('Classy Wine Glass', './img/wine-glass.jpg')
+
+getThreeItems();
+renderNewItems();
