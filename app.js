@@ -150,7 +150,7 @@ function renderChart(){
         borderWidth: 2
       }]
     },
-    options: {
+    options: {      
       plugins: {
         title: {
           text: 'Item Views and Likes',
