@@ -46,18 +46,33 @@ Item.prototype.getLikesPercentage = function (likes, views) {
 
 // ------------------------------- Global Functions ------------------------------//
 function getThreeItems() {
-  let leftItemIndex = Math.floor(Math.random() * Item.allItems.length);
-  leftItem = Item.allItems[leftItemIndex];
-  let middleItemIndex = Math.floor(Math.random() * Item.allItems.length);
-  middleItem = Item.allItems[middleItemIndex];
-  let rightItemIndex = Math.floor(Math.random() * Item.allItems.length);
-  rightItem = Item.allItems[rightItemIndex];
-  while (leftItem === middleItem || leftItem === rightItem || middleItem === rightItem) {
-    leftItemIndex = Math.floor(Math.random() * Item.allItems.length);
+  const currentItems = [leftItem, middleItem, rightItem];
+  while (currentItems.includes(leftItem)){
+    let leftItemIndex = Math.floor(Math.random() * Item.allItems.length);
     leftItem = Item.allItems[leftItemIndex];
-    middleItemIndex = Math.floor(Math.random() * Item.allItems.length);
+  }
+  currentItems.push(leftItem);
+
+  while (currentItems.includes(middleItem)){
+    let middleItemIndex = Math.floor(Math.random() * Item.allItems.length);
     middleItem = Item.allItems[middleItemIndex];
   }
+  currentItems.push(middleItem);
+
+  while (currentItems.includes(rightItem)){
+    let rightItemIndex = Math.floor(Math.random() * Item.allItems.length);
+    rightItem = Item.allItems[rightItemIndex];
+  }
+  currentItems.push(rightItem);
+
+  // let rightItemIndex = Math.floor(Math.random() * Item.allItems.length);
+  // rightItem = Item.allItems[rightItemIndex];
+  // while (leftItem === middleItem || leftItem === rightItem || middleItem === rightItem) {
+  //   leftItemIndex = Math.floor(Math.random() * Item.allItems.length);
+  //   leftItem = Item.allItems[leftItemIndex];
+  //   middleItemIndex = Math.floor(Math.random() * Item.allItems.length);
+  //   middleItem = Item.allItems[middleItemIndex];
+  // }
   leftItem.views++;
   middleItem.views++;
   rightItem.views++;
@@ -100,34 +115,59 @@ function renderChart(){
     myLikesPercentageArr.push(item.likesPercentage);
   }
 
-  for(let i = 0; i <Item.allItems.length; i++){
-    if(i % 4 === 0){
-      myColorArr.push('red');
-    }
-    else if (i % 4 === 1){
-      myColorArr.push('blue');
-    }
-    else if (i % 4 === 2){
-      myColorArr.push('green');
-    }
-    else {
-      myColorArr.push('yellow');
-    }
-  }
+  // for(let i = 0; i <Item.allItems.length; i++){
+  //   if(i % 4 === 0){
+  //     myColorArr.push('red');
+  //   }
+  //   else if (i % 4 === 1){
+  //     myColorArr.push('blue');
+  //   }
+  //   else if (i % 4 === 2){
+  //     myColorArr.push('green');
+  //   }
+  //   else {
+  //     myColorArr.push('yellow');
+  //   }
+  // }
 
   var itemsChart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: myItemNameArr,
       datasets: [{
-        label: 'likes',
+          id: 'views',
+          label: 'Views',
+          data: myViewsArr,
+          backgroundColor: 'blue',
+          borderColor: 'black',
+          borderWidth: 2
+        },{
+        id: 'likes',
+        label: 'Likes',
         data: myLikesArr,
-        backgroundColor: myColorArr,
-        borderColor: myColorArr,
-        boderWidth: 1
+        backgroundColor: 'red',
+        borderColor: 'black',
+        borderWidth: 2
       }]
     },
     options: {
+      plugins: {
+        title: {
+          text: 'Item Views and Likes',
+          display: true,
+          font: {
+            size: 20
+          },
+          padding: 15
+        },
+        legend: {
+          position: 'bottom'
+        }},
+      layout: {
+        padding: {
+          top: 50
+        }
+      },
       scales: {
         y: {
           beginAtZero: true
