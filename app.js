@@ -19,11 +19,11 @@ let middleItem = null;
 let rightItem = null;
 
 // ------------------------------- Constructor Function------------------------------//
-function Item (name, imgPath, views = 0, likes = 0) {
+function Item (name, imgPath) {
   this.name = name;
   this.imgPath = imgPath;
-  this.views = views;
-  this.likes = likes;
+  this.views = 0;
+  this.likes = 0;
   this.likesPercentage = 0;
 }
 
@@ -46,7 +46,9 @@ function getFromStorage() {
     let parsedItems = JSON.parse(storedItems);
     console.log(parsedItems);
     for (let item of parsedItems) {
-      let newItem = new Item(item.name, item.imgPath, item.views, item.likes)
+      let newItem = new Item(item.name, item.imgPath)
+      newItem.views = item.views;
+      newItem.likes = item.likes;
       Item.allItems.push(newItem);
     }
     renderResults();
@@ -200,43 +202,25 @@ function handleClick(e) {
   console.log(imageClicked);
   if (imageClicked === 'leftImg' || imageClicked === 'middleImg' || imageClicked === 'rightImg') {
     clickCounter++;
-    console.log(clickCounter);
-    if (clickCounter === roundsOfVoting) {
-      if (imageClicked === 'leftImg') {
-        leftItem.likes++;
-        renderResults();
-      } if (imageClicked === 'middleImg') {
-        middleItem.likes++;
-        renderResults();
-      } if (imageClicked === 'rightImg') {
-        rightItem.likes++;
-        renderResults();
-      }
-      alert('Thanks for your insight!');
-      buttonElem.style.display = 'block';
-      clickSectionElem.removeEventListener('click', handleClick);
-    } else {
       if (imageClicked === 'leftImg') {
       leftItem.likes++;
-      renderResults();
-      getThreeItems();
-      renderNewItems();
     } if (imageClicked === 'middleImg') {
       middleItem.likes++;
-      renderResults();
-      getThreeItems();
-      renderNewItems();
     } if (imageClicked === 'rightImg') {
       rightItem.likes++;
-      renderResults();
-      getThreeItems();
-      renderNewItems();
+    } if (clickCounter === roundsOfVoting) {
+    alert('Thanks for your insight!');
+    buttonElem.style.display = 'block';
+    clickSectionElem.removeEventListener('click', handleClick);
+    renderResults();
+    } else {
+    getThreeItems();
+    renderNewItems();
     }
-  }
-  }
-  else {
+  } else {
     alert('That was not a valid selection.');
   }
+  
 }
 
 function handleButtonClick(){
