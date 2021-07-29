@@ -1,7 +1,6 @@
 'use strict';
 
 // ------------------------------- Global Variables ------------------------------//
-let viewCounter = 0;
 let clickCounter = 0;
 const roundsOfVoting = 25;
 
@@ -13,10 +12,7 @@ const middleImgElem = document.getElementById('middleImg');
 const middleH2Elem = document.getElementById('middleH2');
 const rightImgElem = document.getElementById('rightImg');
 const rightH2Elem = document.getElementById('rightH2');
-
-// let buttonElem;
-// let ulElem2 = document.getElementById('clicksCounterUL2');
-// let liElem2;
+const buttonElem = document.getElementById('viewResults');
 
 let leftItem = null;
 let middleItem = null;
@@ -29,7 +25,6 @@ function Item (name, imgPath) {
   this.views = 0;
   this.likes = 0;
   this.likesPercentage = 0;
-  Item.allItems.push(this);
 }
 
 Item.allItems = [];
@@ -40,11 +35,51 @@ Item.prototype.renderItem = function (img, h2) {
   h2.textContent = this.name;
 }
 
-Item.prototype.getLikesPercentage = function (likes, views) {
+Item.prototype.getLikesPercentage = function () {
   this.likesPercentage = Number(this.likes / this.views * 100).toFixed(2);
 }
 
 // ------------------------------- Global Functions ------------------------------//
+function getFromStorage() {
+  let storedItems = localStorage.getItem('items');
+  if (storedItems) {
+    let parsedItems = JSON.parse(storedItems);
+    console.log(parsedItems);
+    for (let item of parsedItems) {
+      let newItem = new Item(item.name, item.imgPath)
+      newItem.views = item.views;
+      newItem.likes = item.likes;
+      Item.allItems.push(newItem);
+    }
+    renderResults();
+  } else {
+      Item.allItems.push(new Item('Star Wars Bag', './img/bag.jpg'));
+      Item.allItems.push(new Item('Banana Cutter', './img/banana.jpg'));
+      Item.allItems.push(new Item('iPad Toilet Paper Stand', './img/bathroom.jpg'));
+      Item.allItems.push(new Item('Toeless Galoshes', './img/boots.jpg'));
+      Item.allItems.push(new Item('All-in-One Breakfast Maker', './img/breakfast.jpg'));
+      Item.allItems.push(new Item('Meatball Bubblegum', './img/bubblegum.jpg'));
+      Item.allItems.push(new Item('Inverted Chair', './img/chair.jpg'));
+      Item.allItems.push(new Item('Cthulhu Action Figure', './img/cthulhu.jpg'));
+      Item.allItems.push(new Item('Dog Duck Bill', './img/dog-duck.jpg'));
+      Item.allItems.push(new Item('Dragon Meat', './img/dragon.jpg'));
+      Item.allItems.push(new Item('Pen Utensil Attachments', './img/pen.jpg'));
+      Item.allItems.push(new Item('Microfiber Cleaning Pet Shoes', './img/pet-sweep.jpg'));
+      Item.allItems.push(new Item('2-in-1 Scissors', './img/scissors.jpg'));
+      Item.allItems.push(new Item('Suede Shark Sleeping Bag', './img/shark.jpg'));
+      Item.allItems.push(new Item('Microfiber Cleaning Baby Onesie', './img/sweep.png'));
+      Item.allItems.push(new Item('Star Wars Tauntaun Sleeping Bag', './img/tauntaun.jpg'));
+      Item.allItems.push(new Item('Unicorn Meat', './img/unicorn.jpg'));
+      Item.allItems.push(new Item('Reverse Watering Can', './img/water-can.jpg'));
+      Item.allItems.push(new Item('Classy Wine Glass', './img/wine-glass.jpg'));
+  }
+}
+
+function putInStorage() {
+  let preppedItems = JSON.stringify(Item.allItems);
+  localStorage.setItem('items', preppedItems);
+}
+
 function getThreeItems() {
   const currentItems = [leftItem, middleItem, rightItem];
   while (currentItems.includes(leftItem)){
@@ -65,14 +100,6 @@ function getThreeItems() {
   }
   currentItems.push(rightItem);
 
-  // let rightItemIndex = Math.floor(Math.random() * Item.allItems.length);
-  // rightItem = Item.allItems[rightItemIndex];
-  // while (leftItem === middleItem || leftItem === rightItem || middleItem === rightItem) {
-  //   leftItemIndex = Math.floor(Math.random() * Item.allItems.length);
-  //   leftItem = Item.allItems[leftItemIndex];
-  //   middleItemIndex = Math.floor(Math.random() * Item.allItems.length);
-  //   middleItem = Item.allItems[middleItemIndex];
-  // }
   leftItem.views++;
   middleItem.views++;
   rightItem.views++;
@@ -87,6 +114,7 @@ function renderNewItems() {
 function renderResults() {
   ulElem.textContent = '';
   for (let item of Item.allItems) {
+    console.log(item);
     let liElem = document.createElement('li');
     if (item.views === 0) {
       liElem.textContent = `${item.name} was not viewed.`;
@@ -94,7 +122,7 @@ function renderResults() {
     }
     else {
       item.getLikesPercentage();
-      liElem.textContent = `${item.name}: ${item.likes} likes out of ${item.views} views. (${item.likesPercentage}%)`;
+      liElem.textContent = `${item.name}: ${item.likes} likes`;
       ulElem.appendChild(liElem);
     }
   }
@@ -115,21 +143,6 @@ function renderChart(){
     myLikesPercentageArr.push(item.likesPercentage);
   }
 
-  // for(let i = 0; i <Item.allItems.length; i++){
-  //   if(i % 4 === 0){
-  //     myColorArr.push('red');
-  //   }
-  //   else if (i % 4 === 1){
-  //     myColorArr.push('blue');
-  //   }
-  //   else if (i % 4 === 2){
-  //     myColorArr.push('green');
-  //   }
-  //   else {
-  //     myColorArr.push('yellow');
-  //   }
-  // }
-
   var itemsChart = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -146,6 +159,13 @@ function renderChart(){
         label: 'Likes',
         data: myLikesArr,
         backgroundColor: 'red',
+        borderColor: 'black',
+        borderWidth: 2
+      },{
+        id: 'percentage',
+        label: 'Percentage',
+        data: myLikesPercentageArr,
+        backgroundColor: 'yellow',
         borderColor: 'black',
         borderWidth: 2
       }]
@@ -177,95 +197,43 @@ function renderChart(){
   });
 }
 
-// function renderResults2() {
-//   ulElem2.textContent = '';
-//   for (let item of Item.allItems) {
-//     let liElem2 = document.createElement('li');
-//     if (item.views === 0) {
-//       liElem2.textContent = `${item.name} was not viewed.`;
-//       ulElem2.appendChild(liElem2);
-//     }
-//     else{
-//       item.getLikesPercentage();
-//       liElem2.textContent = `${item.name}: ${item.likes} likes out of ${item.views} views. (${item.likesPercentage}%)`;
-//       ulElem2.appendChild(liElem2);
-//     }
-//   }
-// }
-
 function handleClick(e) {
   let imageClicked = e.target.id;
   console.log(imageClicked);
   if (imageClicked === 'leftImg' || imageClicked === 'middleImg' || imageClicked === 'rightImg') {
     clickCounter++;
-    console.log(clickCounter);
-    if (clickCounter === roundsOfVoting+1) {
-      // buttonElem = document.createElement('button');
-      // buttonElem.textContent = 'View Results';
-      // buttonElem.type = 'button';
-      // clickSectionElem.appendChild(buttonElem);
-      // buttonElem.addEventListener('click', handleButtonClick);
-      // let anchorElem = document.createElement('a');
-      // let linkNode = document.createTextNode('View Results');
-      // anchorElem.appendChild(linkNode);
-      // anchorElem.href = "./results.html"
-      // clickSectionElem.appendChild(anchorElem);
-      renderChart();
-      alert('Thanks for your insight!')
-      clickSectionElem.removeEventListener('click', handleClick);
-    } else if (imageClicked === 'leftImg') {
+      if (imageClicked === 'leftImg') {
       leftItem.likes++;
-      renderResults();
-      getThreeItems();
-      renderNewItems();
-    } else if (imageClicked === 'middleImg') {
+    } if (imageClicked === 'middleImg') {
       middleItem.likes++;
-      renderResults();
-      getThreeItems();
-      renderNewItems();
-    } else if (imageClicked === 'rightImg') {
+    } if (imageClicked === 'rightImg') {
       rightItem.likes++;
-      renderResults();
-      getThreeItems();
-      renderNewItems();
+    } if (clickCounter === roundsOfVoting) {
+    alert('Thanks for your insight!');
+    buttonElem.style.display = 'block';
+    clickSectionElem.removeEventListener('click', handleClick);
+    renderResults();
+    } else {
+    getThreeItems();
+    renderNewItems();
     }
-  }
-  else {
+  } else {
     alert('That was not a valid selection.');
   }
+  
 }
 
-// function handleButtonClick(e){
-//   window.open('./results.html');
-//   renderResults2();
-//   buttonElem.removeEventListener('click', handleButtonClick);
-// }
+function handleButtonClick(){
+  renderChart();
+  putInStorage();
+  buttonElem.removeEventListener('click', handleButtonClick);
+}
 
 // ------------------------------- Event Listener ------------------------------//
-
 clickSectionElem.addEventListener('click', handleClick);
+buttonElem.addEventListener('click', handleButtonClick);
 
 // ------------------------------- Calling Functions ------------------------------//
-
-new Item('Star Wars Bag', './img/bag.jpg');
-new Item('Banana Cutter', './img/banana.jpg');
-new Item('iPad Toilet Paper Stand', './img/bathroom.jpg')
-new Item('Toeless Galoshes', './img/boots.jpg')
-new Item('All-in-One Breakfast Maker', './img/breakfast.jpg')
-new Item('Meatball Bubblegum', './img/bubblegum.jpg')
-new Item('Inverted Chair', './img/chair.jpg')
-new Item('Cthulhu Action Figure', './img/cthulhu.jpg')
-new Item('Dog Duck Bill', './img/dog-duck.jpg')
-new Item('Dragon Meat', './img/dragon.jpg')
-new Item('Pen Utensil Attachments', './img/pen.jpg')
-new Item('Microfiber Cleaning Pet Shoes', './img/pet-sweep.jpg')
-new Item('2-in-1 Scissors', './img/scissors.jpg')
-new Item('Suede Shark Sleeping Bag', './img/shark.jpg')
-new Item('Microfiber Cleaning Baby Onesie', './img/sweep.png')
-new Item('Star Wars Tauntaun Sleeping Bag', './img/tauntaun.jpg')
-new Item('Unicorn Meat', './img/unicorn.jpg')
-new Item('Reverse Watering Can', './img/water-can.jpg')
-new Item('Classy Wine Glass', './img/wine-glass.jpg')
-
+getFromStorage();
 getThreeItems();
 renderNewItems();

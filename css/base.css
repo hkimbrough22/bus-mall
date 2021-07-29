@@ -11,3 +11,7 @@ img.small {
 body {
   background-color: burlywood;
 }
+
+#viewResults {
+  display: none;
+}

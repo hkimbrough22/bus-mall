@@ -32,6 +32,10 @@ header nav ul {
   padding: 5px;
 }
 
+#clickSection div {
+  width: 200px;
+}
+
 #clickSection {
   display:flex;
   align-items: flex-end;
